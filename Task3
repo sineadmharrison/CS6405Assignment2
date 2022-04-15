@@ -1,44 +1,43 @@
-def gbm_bestfit(X_train, y_train):
-  import pandas as pd
-  import numpy as np
-  from sklearn.model_selection import train_test_split
-  from sklearn.neighbors import KNeighborsClassifier
-  from sklearn import metrics
-  from sklearn.tree import DecisionTreeClassifier
-  from sklearn import tree
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import metrics
+from sklearn.tree import DecisionTreeClassifier
+from sklearn import tree
 
-  from sklearn.preprocessing import MinMaxScaler
-  from sklearn.decomposition import PCA
-  from sklearn.model_selection import GridSearchCV, cross_val_score
-  from sklearn.pipeline import Pipeline
-  from sklearn.feature_selection import RFE
-  from sklearn.tree import DecisionTreeClassifier
-  from sklearn.svm import SVR
-  from sklearn.ensemble import GradientBoostingClassifier
-  from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.decomposition import PCA
+from sklearn.model_selection import GridSearchCV, cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.feature_selection import RFE
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVR
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.impute import SimpleImputer
 
-  imputer1 = SimpleImputer(missing_values = np.nan, strategy = 'mean')
-  imputer2 = SimpleImputer(missing_values = np.inf, strategy = 'mean')
-  imputer3 = SimpleImputer(missing_values = -np.inf, strategy = 'mean')
+imputer1 = SimpleImputer(missing_values = np.nan, strategy = 'mean')
+imputer2 = SimpleImputer(missing_values = np.inf, strategy = 'mean')
+imputer3 = SimpleImputer(missing_values = -np.inf, strategy = 'mean')
 
-  scaler = MinMaxScaler()
-  estimator = SVR(kernel = 'linear')
-  pca = PCA()
-  rfe = RFE(estimator)
-  gbm = GradientBoostingClassifier()
+scaler = MinMaxScaler()
+estimator = SVR(kernel = 'linear')
+pca = PCA()
+rfe = RFE(estimator)
+gbm = GradientBoostingClassifier()
 
-  params = {
-      'pca__n_components' : list(range(1, X_train.shape[1] + 1, 10)),
-      'gbm__loss' : ['deviance', 'exponential'],
-      'gbm__learning_rate' : [0.1, 0.2, 0.5],
-      'gbm__n_estimators' : [100, 200, 400]
-  }
+params = {
+    'pca__n_components' : list(range(1, X_train.shape[1] + 1, 10)),
+    'gbm__loss' : ['deviance', 'exponential'],
+    'gbm__learning_rate' : [0.1, 0.2, 0.5],
+    'gbm__n_estimators' : [100, 200, 400]
+}
 
-  pipe = Pipeline(steps = [('imputer1', imputer1), ('imputer2', imputer2), ('imputer3', imputer3),
-                           ('scaler', scaler), ('pca', pca), ('gbm', gbm)])
+pipe = Pipeline(steps = [('imputer1', imputer1), ('imputer2', imputer2), ('imputer3', imputer3),
+                         ('scaler', scaler), ('pca', pca), ('gbm', gbm)])
 
-  search = GridSearchCV(pipe, params, n_jobs = 2)
-  search.fit(X_train, y_train)
+search = GridSearchCV(pipe, params, n_jobs = 2)
+search.fit(X_train, y_train)
 
-  print("Best parameter (CV score=%0.3f):" % search.best_score_)
-  print(search.best_params_)
+print("Best parameter (CV score=%0.3f):" % search.best_score_)
+print(search.best_params_)
